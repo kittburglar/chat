@@ -24,6 +24,7 @@
 
 				// Get required nodes
 				status = getNode('.chat-status span');
+				messages = getNode('.chat-messages');
 				textarea = getNode('.chat-textarea');
 				chatName = getNode('.chat-name');
 
@@ -45,9 +46,27 @@
 					var socket = io.connect('http://127.0.0.1:8080');
 				} catch(e) {
 					// Set status to warn user
+					setStatus('Error connecting to server.');
 				}
 
 				if(socket != undefined) {
+
+					//Listen for output
+					socket.on('output', function(data){
+						if(data.length){
+							// Loop through results
+							for(var x = 0; x < data.length; x = x + 1) {
+								var message = document.createElement('div');
+
+								message.setAttribute('class', 'chat-message');
+								message.textContent = data[x].name + ': ' + data[x].message;
+
+								//Append 
+								messages.appendChild(message);
+								messages.insertBefore(message, messages.firstChild);
+							}
+						}
+					});
 
 					//Listen for a status
 						socket.on('status', function(data){
